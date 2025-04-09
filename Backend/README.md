@@ -191,3 +191,115 @@ curl -X POST http://localhost:<port>/users/login \
 
 - Ensure the `Content-Type` header is set to `application/json`.
 - The `token` is a JWT used for authentication in subsequent requests.
+
+### HTTP GET
+
+`/users/profile`
+
+#### Description
+
+This endpoint is used to retrieve the profile of the currently authenticated user.
+
+#### Headers / Cookies
+
+- **Authorization**: Bearer `<JWT token>` (required)
+
+#### Response
+
+- **200 OK**
+
+  - **Description**: Successfully retrieved user profile.
+  - **Body**:
+    ```json
+    {
+      "user": {
+        "_id": "string",
+        "fullname": {
+          "firstname": "string",
+          "lastname": "string"
+        },
+        "email": "string"
+      }
+    }
+    ```
+
+- **401 Unauthorized**
+  - **Description**: Missing or invalid token.
+  - **Body**:
+    ```json
+    {
+      "message": "Unauthorized"
+    }
+    ```
+
+#### Example Request
+
+```bash
+curl -X GET http://localhost:<port>/users/profile \
+-H "Authorization: Bearer <JWT token>"
+```
+
+#### Example Response (200 OK)
+
+```json
+{
+  "user": {
+    "_id": "64f9c8e2...",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "john.doe@example.com"
+  }
+}
+```
+
+---
+
+### HTTP GET
+
+`/users/logout`
+
+#### Description
+
+This endpoint is used to log out the currently authenticated user by blacklisting their token.
+
+#### Headers
+
+- **Authorization**: Bearer `<JWT token>` (required)
+
+#### Response
+
+- **200 OK**
+
+  - **Description**: Successfully logged out.
+  - **Body**:
+    ```json
+    {
+      "message": "Logged out successfully"
+    }
+    ```
+
+- **401 Unauthorized**
+  - **Description**: Missing or invalid token.
+  - **Body**:
+    ```json
+    {
+      "message": "Unauthorized"
+    }
+    ```
+
+#### Example Request
+
+```bash
+curl -X GET http://localhost:<port>/users/logout \
+-H "Authorization: Bearer <JWT token>"
+```
+
+#### Example Response (200 OK)
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
