@@ -303,3 +303,122 @@ curl -X GET http://localhost:<port>/users/logout \
   "message": "Logged out successfully"
 }
 ```
+
+### HTTP POST
+
+`/captains/register`
+
+#### Description
+
+This endpoint is used to register a new captain in the system.
+
+#### Request Body
+
+The request body must be a JSON object with the following structure:
+
+```json
+{
+  "fullname": {
+    "firstname": "string (min length: 3, required)",
+    "lastname": "string (optional, min length: 3)"
+  },
+  "email": "string (valid email format, required)",
+  "password": "string (min length: 8, required)",
+  "vehicle": {
+    "color": "string (min length: 3, required)",
+    "plate": "string (min length: 3, required)",
+    "capacity": "integer (min: 1, required)",
+    "vehicleType": "string (one of: 'car', 'bike', 'auto', required)"
+  }
+}
+```
+
+#### Response
+
+- **201 Created**
+
+  - **Description**: Captain successfully registered.
+  - **Body**:
+    ```json
+    {
+      "token": "string (JWT token)",
+      "captain": {
+        "_id": "string",
+        "fullname": {
+          "firstname": "string",
+          "lastname": "string"
+        },
+        "email": "string",
+        "vehicle": {
+          "color": "string",
+          "plate": "string",
+          "capacity": "integer",
+          "vehicleType": "string"
+        }
+      }
+    }
+    ```
+
+- **400 Bad Request**
+  - **Description**: Validation errors or missing required fields.
+  - **Body**:
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "string (error message)",
+          "param": "string (field name)",
+          "location": "string (body)"
+        }
+      ]
+    }
+    ```
+
+#### Example Request
+
+```bash
+curl -X POST http://localhost:<port>/captains/register \
+-H "Content-Type: application/json" \
+-d '{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Smith"
+  },
+  "email": "john.smith@example.com",
+  "password": "securepassword",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC123",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}'
+```
+
+#### Example Response (201 Created)
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "64f9c8e2...",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Smith"
+    },
+    "email": "john.smith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }
+}
+```
+
+#### Notes
+
+- Ensure the `Content-Type` header is set to `application/json`.
+- The `password` field is hashed before being stored in the database.
+- The `token` is a JWT used for authentication in subsequent requests.
