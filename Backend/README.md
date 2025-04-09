@@ -422,3 +422,231 @@ curl -X POST http://localhost:<port>/captains/register \
 - Ensure the `Content-Type` header is set to `application/json`.
 - The `password` field is hashed before being stored in the database.
 - The `token` is a JWT used for authentication in subsequent requests.
+
+### HTTP POST
+
+`/captains/login`
+
+#### Description
+
+This endpoint is used to authenticate a captain and return a JWT token.
+
+#### Request Body
+
+The request body must be a JSON object with the following structure:
+
+```json
+{
+  "email": "string (valid email format, required)",
+  "password": "string (min length: 8, required)"
+}
+```
+
+#### Response
+
+- **200 OK**
+
+  - **Description**: Captain successfully authenticated.
+  - **Body**:
+    ```json
+    {
+      "token": "string (JWT token)",
+      "captain": {
+        "_id": "string",
+        "fullname": {
+          "firstname": "string",
+          "lastname": "string"
+        },
+        "email": "string",
+        "vehicle": {
+          "color": "string",
+          "plate": "string",
+          "capacity": "integer",
+          "vehicleType": "string"
+        }
+      }
+    }
+    ```
+
+- **400 Bad Request**
+  - **Description**: Validation errors or missing required fields.
+  - **Body**:
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "string (error message)",
+          "param": "string (field name)",
+          "location": "string (body)"
+        }
+      ]
+    }
+    ```
+
+- **401 Unauthorized**
+  - **Description**: Invalid email or password.
+  - **Body**:
+    ```json
+    {
+      "message": "Invalid credentials"
+    }
+    ```
+
+#### Example Request
+
+```bash
+curl -X POST http://localhost:<port>/captains/login \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "john.smith@example.com",
+  "password": "securepassword"
+}'
+```
+
+#### Example Response (200 OK)
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "captain": {
+    "_id": "64f9c8e2...",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Smith"
+    },
+    "email": "john.smith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }
+}
+```
+
+---
+
+### HTTP GET
+
+`/captains/profile`
+
+#### Description
+
+This endpoint is used to retrieve the profile of the currently authenticated captain.
+
+#### Headers / Cookies
+
+- **Authorization**: Bearer `<JWT token>` (required)
+
+#### Response
+
+- **200 OK**
+
+  - **Description**: Successfully retrieved captain profile.
+  - **Body**:
+    ```json
+    {
+      "captain": {
+        "_id": "string",
+        "fullname": {
+          "firstname": "string",
+          "lastname": "string"
+        },
+        "email": "string",
+        "vehicle": {
+          "color": "string",
+          "plate": "string",
+          "capacity": "integer",
+          "vehicleType": "string"
+        }
+      }
+    }
+    ```
+
+- **401 Unauthorized**
+  - **Description**: Missing or invalid token.
+  - **Body**:
+    ```json
+    {
+      "message": "Unauthorized"
+    }
+    ```
+
+#### Example Request
+
+```bash
+curl -X GET http://localhost:<port>/captains/profile \
+-H "Authorization: Bearer <JWT token>"
+```
+
+#### Example Response (200 OK)
+
+```json
+{
+  "captain": {
+    "_id": "64f9c8e2...",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Smith"
+    },
+    "email": "john.smith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }
+}
+```
+
+---
+
+### HTTP GET
+
+`/captains/logout`
+
+#### Description
+
+This endpoint is used to log out the currently authenticated captain by blacklisting their token.
+
+#### Headers
+
+- **Authorization**: Bearer `<JWT token>` (required)
+
+#### Response
+
+- **200 OK**
+
+  - **Description**: Successfully logged out.
+  - **Body**:
+    ```json
+    {
+      "message": "Logged out successfully"
+    }
+    ```
+
+- **401 Unauthorized**
+  - **Description**: Missing or invalid token.
+  - **Body**:
+    ```json
+    {
+      "message": "Unauthorized"
+    }
+    ```
+
+#### Example Request
+
+```bash
+curl -X GET http://localhost:<port>/captains/logout \
+-H "Authorization: Bearer <JWT token>"
+```
+
+#### Example Response (200 OK)
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
