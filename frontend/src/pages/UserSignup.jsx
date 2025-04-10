@@ -1,24 +1,40 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { UserDataContext } from "../context/UserContext";
 
 const UserSignup = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [firstName, setfirstName] = useState("");
   const [lastname, setlastname] = useState("");
-  const [userData, setuserData] = useState({});
 
-  const submitHandler = (e) => {
+  const navigate = useNavigate();
+  const { user, setuser } = useContext(UserDataContext);
+
+  const submitHandler = async (e) => {
     e.preventDefault();
 
-    setuserData({
-      fullName: {
-        firstName: firstName,
-        lastName: lastname,
+    const newUser = {
+      fullname: {
+        firstname: firstName,
+        lastname: lastname,
       },
       email: email,
       password: password,
-    });
+    };
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/users/register`,
+      newUser
+    );
+
+    if (response.status === 201) {
+      const data = response.data;
+      setuser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/user-home");
+    }
 
     setfirstName("");
     setlastname("");
@@ -50,7 +66,7 @@ const UserSignup = () => {
                 }}
                 type="text"
                 placeholder="First Name"
-                className="bg-[#eeeeee] rounded px-4 py-2 border w-full text-base placeholder:text-sm"
+                className="bg-[#eeeeee] rounded px-4 py-2 w-full text-base placeholder:text-sm"
               />
               <input
                 required
@@ -60,7 +76,7 @@ const UserSignup = () => {
                 }}
                 type="text"
                 placeholder="Last Name"
-                className="bg-[#eeeeee] rounded px-4 py-2 border w-full text-base placeholder:text-sm"
+                className="bg-[#eeeeee] rounded px-4 py-2 w-full text-base placeholder:text-sm"
               />
             </div>
 
@@ -73,7 +89,7 @@ const UserSignup = () => {
               }}
               type="email"
               placeholder="email@example.com"
-              className="bg-[#eeeeee] mb-5 rounded px-4 py-2 border w-full text-base placeholder:text-sm"
+              className="bg-[#eeeeee] mb-5 rounded px-4 py-2 w-full text-base placeholder:text-sm"
             />
 
             <h3 className="text-base font-medium mb-2">Enter Password</h3>
@@ -85,10 +101,10 @@ const UserSignup = () => {
               }}
               type="password"
               placeholder="Password"
-              className="bg-[#eeeeee] mb-5 rounded px-4 py-2 border w-full text-base placeholder:text-sm"
+              className="bg-[#eeeeee] mb-5 rounded px-4 py-2 w-full text-base placeholder:text-sm"
             />
 
-            <button className="bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 border w-full text-lg placeholder:text-base">
+            <button className="bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-lg placeholder:text-base">
               Register
             </button>
           </form>
