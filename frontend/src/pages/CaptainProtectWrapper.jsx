@@ -19,7 +19,7 @@ const CaptainProtectWrapper = ({ children }) => {
   // here we are verifying the token and getting the captain data
   // if the token is valid, we set the captain data in the context
   axios
-    .get(`${import.meta.env.VITE_API_URL}/captains/profile`, {
+    .get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

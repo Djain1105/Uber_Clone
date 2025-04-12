@@ -14,11 +14,12 @@ const UserProtectWrapper = ({ children }) => {
       navigate("/user-login");
     }
   }, [token]);
-
+  
   // here we are verifying the token and getting the user data
   // if the token is valid, we set the user data in the context
+  
   axios
-    .get(`${import.meta.env.VITE_API_URL}/users/profile`, {
+    .get(`${import.meta.env.VITE_BASE_URL}/users/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
