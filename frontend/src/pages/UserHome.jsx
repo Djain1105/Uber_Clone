@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import axios from "axios";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import "remixicon/fonts/remixicon.css";
@@ -9,8 +10,10 @@ import LookingForDriver from "../components/LookingForDriver";
 import WaitingForDriver from "../components/WaitingForDriver";
 
 const UserHome = () => {
-  const [pickup, setpickup] = useState("");
-  const [destination, setdestination] = useState("");
+  const [pickup, setPickup] = useState("");
+  const [destination, setDestination] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [isPickup, setIsPickup] = useState(true);
   const [panelOpen, setpanelOpen] = useState(false);
   const panelRef = useRef(null);
   const panelCloseRef = useRef(null);
@@ -25,12 +28,26 @@ const UserHome = () => {
     e.preventDefault();
   };
 
+  const fetchSuggestions = async (query) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`,
+        {
+          params: { address: query },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      setSuggestions(response.data);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
+  };
+
   useGSAP(
     function () {
       if (panelOpen) {
         gsap.to(panelRef.current, {
           height: "70%",
-          // padding: 24,
         });
         gsap.to(panelCloseRef.current, {
           opacity: 1,
@@ -38,7 +55,6 @@ const UserHome = () => {
       } else {
         gsap.to(panelRef.current, {
           height: "0%",
-          // padding: 0,
         });
         gsap.to(panelCloseRef.current, {
           opacity: 0,
@@ -130,10 +146,12 @@ const UserHome = () => {
             <input
               onClick={() => {
                 setpanelOpen(true);
+                setIsPickup(true);
               }}
               value={pickup}
               onChange={(e) => {
-                setpickup(e.target.value);
+                setPickup(e.target.value);
+                fetchSuggestions(e.target.value);
               }}
               className="bg-[#eee] px-12 py-2 rounded-lg text-base w-full mt-4"
               type="text"
@@ -142,10 +160,12 @@ const UserHome = () => {
             <input
               onClick={() => {
                 setpanelOpen(true);
+                setIsPickup(false);
               }}
               value={destination}
               onChange={(e) => {
-                setdestination(e.target.value);
+                setDestination(e.target.value);
+                fetchSuggestions(e.target.value);
               }}
               className="bg-[#eee] px-12 py-2 rounded-lg text-base w-full mt-2"
               type="text"
@@ -157,6 +177,10 @@ const UserHome = () => {
           <LocationSearchPanel
             setpanelOpen={setpanelOpen}
             setvehiclePanelOpen={setvehiclePanelOpen}
+            suggestions={suggestions}
+            setPickup={setPickup}
+            setDestination={setDestination}
+            isPickup={isPickup}
           />
         </div>
       </div>
